@@ -47,7 +47,7 @@ parse_arguments() {
                 filter_currency="$1"
                 shift
                 ;;
-            list|list_currency|status|profit)
+            list|list-currency|status|profit)
                 # Last command to be added overwrites the previous one
                 command="$1"
                 shift
@@ -114,6 +114,21 @@ execute_command() {
     esac
 }
 
+# Function that processes the file and applies filters
+process_file() {
+    local logfile="$1"
+    # Check if currency_filter is empty
+    if [[ -z "$filter_currency" ]]; then
+        # Filter records based on the user and date
+        awk -F';' -v u="$user" -v b="$date_before" -v a="$date_after" \
+            '$1 == u && $2 < b && $2 > a' "$logfile"
+    else
+        # Filter records based on the user, date and currency
+        awk -F';' -v u="$user" -v b="$date_before" -v a="$date_after" -v c="$filter_currency" \
+            '$1 == u && $2 < b && $2 > a && $3 == c' "$logfile"
+    fi
+}
+
 # Function that displays records for specified user
 list_records() {
     # Loop through logfiles
@@ -122,18 +137,38 @@ list_records() {
         if [[ ! -s "$logfile" ]]; then
             echo "Error: Logfile '$logfile' is empty or does not exist." >&2
             exit 1
-        fi
-        # Check if currency_filter is empty
-        if [[ -z "$filter_currency" ]]; then
-            # Filter records based on the user and date
-            awk -F';' -v u="$user" -v b="$date_before" -v a="$date_after" \
-                '$1 == u && $2 < b && $2 > a' "$logfile"
+        # Check if the logfile is compressed
+        elif [[ $logfile == *.gz ]]; then
+            # Decompress compressed file
+            gunzip -c "$logfile" | process_file
         else
-            # Filter records based on the user, date and currency
-            awk -F';' -v u="$user" -v b="$date_before" -v a="$date_after" -v c="$filter_currency" \
-                '$1 == u && $2 < b && $2 > a && $3 == c' "$logfile"
+            process_file "$logfile"
         fi
     done
+}
+
+# Function that displays sorted list of currencies
+list_currency() {
+    # Loop through logfiles
+    for logfile in "${log_files[@]}"; do
+        # Check if logfile is empty
+        if [[ ! -s "$logfile" ]]; then
+        echo "Error: Logfile '$logfile' is empty or does not exist." >&2
+        exit 1
+        # Check if the logfile is compressed
+        elif [[ $logfile == *.gz ]]; then
+            # Decompress compressed file
+            zcat "$logfile" | process_file | cut -d';' -f3
+        else
+            process_file "$logfile" | cut -d';' -f3
+        fi
+        # Sort the output and remove duplicates after the loop
+    done | sort -u
+}
+
+# Function that displays sorted and calculated state of currencies held by an user 
+display_status() {
+    echo"TODO"
 }
 
 # Delete later
