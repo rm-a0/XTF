@@ -12,10 +12,11 @@ Value:       should contain the decimal number rounded to 4 decimals (separated 
 # Command and filters
 
 __Commands:__
-- list            :
-- list-currency   :
+- list            
+- list-currency   
 - status
-- profit
+- profit 
+/
 __Filters:__
 - -a DATE
 - -b DATE
