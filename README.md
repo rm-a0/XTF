@@ -1,6 +1,6 @@
 # Description
 Script for processing files that include records in this format: \
-USRENAME;DATE AND TIME;CURRENCY;VALUE
+__USRENAME;DATE AND TIME;CURRENCY;VALUE__
 
 <pre>
 Username:    string containing printable ASCII characters only, without white spaces and semicolons
@@ -9,4 +9,9 @@ Currency:    should contain the code of a currency but it supports also full nam
 Value:       should contain the decimal number rounded to 4 decimals (separated by dot)
 </pre>
 
+# Command and filters
+
+__Commands:__ \
+- 
 # How to run
+
