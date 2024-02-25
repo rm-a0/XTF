@@ -1,0 +1,238 @@
+#!/bin/sh
+
+# xrepcim00
+# 25.2.2024
+
+# Set default value of environment variable
+: "${XTF_PROFIT:=20}"
+
+# Function that displays help instructions
+display_help() {
+    echo "Usage: $0 [-h|--help] [FILTER] [COMMAND] USER LOG [LOG2 [...]]"
+    echo ""
+    echo "  -h, --help            Display this help message"
+    echo "Filters:"
+    echo "  -a DATETIME           Consider only records after this date and time. DATETIME format: YYYY-MM-DD HH:MM:SS"
+    echo "  -b DATETIME           Consider only records before this date and time. DATETIME format: YYYY-MM-DD HH:MM:SS"
+    echo "  -c CURRENCY           Consider only records matching the specified currency"
+    echo ""
+    echo "Commands:"
+    echo "  list                  Display records for the specified user"
+    echo "  list-currency         Display a sorted list of currencies"
+    echo "  status                Display the actual account status grouped and sorted by currencies"
+    echo "  profit                Display the customer's account status with included fictitious income"
+}
+
+# Function that parses arguments from command line
+parse_arguments() {
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+            -h|--help)
+                # Display help and exit program (doesn't matter if there were other arguments given)
+                display_help
+                exit 0
+                ;;
+            -a)
+                shift
+                date_after="$1"
+                shift
+                ;;
+            -b)
+                shift
+                date_before="$1"
+                shift
+                ;;
+            -c)
+                shift
+                filter_currency="$filter_currency $1"
+                shift
+                ;;
+            list|list-currency|status|profit)
+                # If command was already set print out an error message
+                if [ -z "$command" ]; then
+                    command="$1"
+                else
+                    echo "Error: Only one command option is allowed." >&2
+                    exit 1
+                fi
+                shift
+                ;;
+            # As last case take any input
+            *)
+                # Check if user wasn't set before (log files shouldn't overwrite the user)
+                if [ -z "$user" ]; then
+                    user="$1"
+                    shift
+                # If user was set we can append the log files into a list
+                else
+                    log_files="$log_files $1"
+                    shift
+                fi
+                ;;
+        esac
+    done
+}
+
+# Function that checks parsed arguments
+check_arguments() {
+    # Define a regular expression pattern to match the correct date-time format
+    datetime_pattern='^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}$'
+
+    # Check if user is specified
+    if [ -z "$user" ]; then
+        echo "Error: User is not specified." >&2
+        exit 1
+    fi
+
+    # Check if log file is specified
+    if [ -z "$log_files" ]; then
+        echo "Error: No log file is specified." >&2
+        exit 1
+    fi
+
+    # Check if date format is correct
+    if ! echo "$date_before" | grep -Eq "$datetime_pattern" || ! echo "$date_after" | grep -Eq "$datetime_pattern"; then
+        echo "Error: Datetime format is incorrect." >&2
+        exit 1
+    fi
+
+    # If command is not specified, display all logs that include user (example one)
+    if [ -z "$command" ]; then
+        process_files
+        exit 0
+    fi
+}
+
+# Function that executes a command
+execute_command() {
+    case "$command" in
+        list)
+            # Process files and display records containing user
+            process_files
+            exit 0
+            ;;
+        list-currency)
+            # Process files and display records containing sorted currencies held by an user
+            process_files | cut -d';' -f3 | sort -u
+            exit 0
+            ;;
+        status)
+            # Store processed files in an array
+            processed_files=$(process_files | cut -d';' -f3,4 | sort)
+            # Calculate profit with 0% increase
+            calculate_profit "0"
+            exit 0
+            ;;
+        profit)
+            # Store processed files in an array
+            processed_files=$(process_files | cut -d';' -f3,4 | sort)
+            # Calculate profit with x% increase
+            calculate_profit "$XTF_PROFIT"
+            exit 0
+            ;;
+    esac
+}
+
+# Function that applies filters
+apply_filters() {
+    logfile="$1"
+
+    # Check if filter_currency list is not empty
+    if [ -n "$filter_currency" ]; then
+        # Iterate over each filter_currency
+        for currency in $filter_currency; do
+            # Filter records based on the user, date, and currency
+            awk -F';' -v u="$user" -v b="$date_before" -v a="$date_after" -v c="$currency" \
+                '$1 == u && $2 < b && $2 > a && $3 == c' "$logfile"
+        done
+    else
+        # No filter currency specified, filter based on user and date only
+        awk -F';' -v u="$user" -v b="$date_before" -v a="$date_after" \
+            '$1 == u && $2 < b && $2 > a' "$logfile"
+    fi
+}
+
+# Function that processes the files
+process_files() {
+    # Loop through logfiles
+    for logfile in $log_files; do
+        # Check if logfile is empty
+        if [ ! -s "$logfile" ]; then
+            echo "Error: Logfile '$logfile' is empty or does not exist." >&2
+            exit 1
+        # Check if the logfile is compressed
+        elif echo "$logfile" | grep -q ".gz$"; then
+            # Decompress compressed file
+            gunzip -c "$logfile" | apply_filters
+        else
+            # Enclose logfile variable in double quotes
+            apply_filters "$logfile"
+        fi
+    done
+}
+
+# Function that calculates profit for each currency held by an user
+calculate_profit() {
+    profit="$1"
+    currency=""
+    amount="0"
+    temp_currency=""
+    temp_amount=""
+
+    # Convert profit to decimal number
+    profit=$(awk -v profit="$profit" 'BEGIN { print 1 + profit / 100 }')
+
+    # Processed files must be sorted
+    for line in $processed_files; do
+        temp_currency=$(echo "$line" | cut -d';' -f1)
+        temp_amount=$(echo "$line" | cut -d';' -f2)
+
+        # If currency is empty assign new currency to it
+        if [ -z "$currency" ]; then
+            currency="$temp_currency"
+        fi
+
+        # When currency is different from temp_currency, display accumulated amount for the currency
+        if [ "$currency" != "$temp_currency" ]; then
+            # If amount is non-negative, multiply it by profit
+            if echo "$amount" | grep -qve '^-'; then
+                amount=$(awk -v amount="$amount" -v profit="$profit" 'BEGIN { printf "%.4f", amount * profit }')
+            fi
+            # Display currency and amount
+            printf "%s : %.4f\n" "$currency" "$amount"
+            # Reset amount for the new currency
+            amount="0"
+            # Assign new currency
+            currency="$temp_currency"
+        fi
+        # Accumulate amount for each currency
+        amount=$(awk -v amount="$amount" -v temp_amount="$temp_amount" 'BEGIN { printf "%.4f", amount + temp_amount }')
+    done
+
+    # Display currency and amount with profit for the last currency
+    if [ -n "$currency" ]; then
+        if echo "$amount" | grep -qve '^-'; then
+            amount=$(awk -v amount="$amount" -v profit="$profit" 'BEGIN { printf "%.4f", amount * profit }')
+        fi
+        printf "%s : %.4f\n" "$currency" "$amount"
+    fi
+}
+
+# Main function
+main() {
+    # Declare global variables
+    command=""
+    user=""
+    log_files=""
+    # Set default filters
+    date_before="9999-99-99 99:99:99"
+    date_after="0000-00-00 00:00:00"
+    filter_currency=""
+
+    parse_arguments "$@"
+    check_arguments
+    execute_command
+}
+
+# Call the main function
+main "${@:-}"
