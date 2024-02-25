@@ -45,7 +45,7 @@ The order of the filters and commands doesnt matter but logs should be at the en
 When multiple commands/filter (excluding -c) are provided, the last one will be executed/applied (-h | --help takes priority over everything). \
 When no command is provided the script will run the __list__ command as deafult.
 
-Examples of input and output
+Examples of input and output:
 <pre>
   $ ./xtf -c ETH -c USD Trader1 cryptoexchange.log
   Trader1;2024-01-16 18:06:32;USD;-3000.0000
