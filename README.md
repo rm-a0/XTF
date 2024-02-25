@@ -17,6 +17,14 @@ __Commands:__
 - list-currency: displays sorted list of all currencise held by and user
 - status: displays the sum of each individual currency held by and user
 - profit: displays the sum of each individual currency held by and user incresed by __XTF_PROFIT__%
+<pre>
+  XTF_PROFIT is an enviromental variable
+  By default the variable is set to 20%
+    # Set default value of environment variable
+    : "${XTF_PROFIT:=20}"
+  You can change the value of this variable (note that the variable remains cahnged for the whole shell session)
+    export XTF_PROFIT=40
+</pre>
 
 __Filters:__  
 - -a DATE  
