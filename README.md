@@ -42,8 +42,8 @@ __Filters:__
   [-h|--help] [FILTER] [COMMAND] USER LOG [LOG2 [...]]
 </pre>
 The order of the filters and commands doesnt matter but logs should be at the end of the line. \
-When multiple commands/filter (excluding -c) are provided, the last one will be executed/applied (-h | --help takes priority over everything). \
-When no command is provided the script will run the __list__ command as deafult.
+When no command is provided the script will run the __list__ command as deafult. \
+Multiple commands are not supported. 
 
 Examples of input and output:
 <pre>
