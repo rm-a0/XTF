@@ -1,7 +1,7 @@
 # Description
 
-Script for processing files that include records in this format:
-USRENAME;DATE AND TIME;CURRENCY;VALUE
+- Script for processing files that include records in this format:
+- USRENAME;DATE AND TIME;CURRENCY;VALUE
 
 <pre>
 Username:    string containing printable ASCII characters only, without white spaces and semicolons
