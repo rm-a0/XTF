@@ -1,6 +1,6 @@
 # Description
 
-- Script for processing files that include records in this format:
+- Script for processing files that include records in this format: \
 - USRENAME;DATE AND TIME;CURRENCY;VALUE
 
 <pre>
