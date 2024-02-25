@@ -11,7 +11,7 @@ Value:       should contain the decimal number rounded to 4 decimals (separated 
 
 # Command and filters
 
-Commands: \
+__Commands:__
 - list
 - list-currency
 - status
