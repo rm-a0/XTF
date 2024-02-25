@@ -47,7 +47,8 @@ When no command is provided the script will run the __list__ command as deafult.
 
 Examples of input and output
 <pre>
-  $ ./xtf -c ETH Trader1 cryptoexchange.log
+  $ ./xtf -c ETH -c USD Trader1 cryptoexchange.log
+  Trader1;2024-01-16 18:06:32;USD;-3000.0000
   Trader1;2024-01-20 11:43:02;ETH;1.9417
   Trader1;2024-01-22 09:17:40;ETH;10.9537
 </pre>
@@ -57,14 +58,21 @@ Examples of input and output
   EUR
 </pre>
 <pre>
-  $ ./xtf -c ETH -c USD Trader1 cryptoexchange.log
-  Trader1;2024-01-16 18:06:32;USD;-3000.0000
-  Trader1;2024-01-20 11:43:02;ETH;1.9417
-  Trader1;2024-01-22 09:17:40;ETH;10.9537
-</pre>
-<pre>
   $ ./xtf status Trader1 cryptoexchange-1.log cryptoexchange-2.log.gz
   ETH : 12.8954
+  EUR : -2000.0000
+  USD : -3000.0000
+</pre>
+<pre>
+  $ ./xtf profit Trader1 cryptoexchange.log
+  ETH : 15.4744
+  EUR : -2000.0000
+  USD : -3000.0000
+</pre>
+<pre>
+  export XTF_PROFIT=40
+  $ ./xtf profit Trader1 cryptoexchange.log
+  ETH : 18.0535
   EUR : -2000.0000
   USD : -3000.0000
 </pre>
