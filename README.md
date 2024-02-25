@@ -4,7 +4,7 @@ __USRENAME;DATE AND TIME;CURRENCY;VALUE__
 
 File xtf_sh supports Bourne Shell, which is a simple shell with basic features \
 File xtf_bash supports Bourne Again Shell, which is extended version of Bourne Shell \
-(difference is only in the code, xtf_sh should run on every UNIX-based system, while xtf_bash will probably not run on older ones) \
+(difference is only in the code, xtf_sh should run on every UNIX-based system, while xtf_bash will probably not run on older ones)
 <pre>
 Username:    string containing printable ASCII characters only, without white spaces and semicolons
 Date         and time: must be in YYYY-MM-DD HH:MM:SS format
@@ -42,5 +42,29 @@ __Filters:__
   [-h|--help] [FILTER] [COMMAND] USER LOG [LOG2 [...]]
 </pre>
 The order of the filters and commands doesnt matter but logs should be at the end of the line. \
-When multiple commands/filter (excluding -c) are provided, the last one will be executed/applied (-h | --help takes priority over everything).
+When multiple commands/filter (excluding -c) are provided, the last one will be executed/applied (-h | --help takes priority over everything). \
+When no command is provided the script will run the __list__ command as deafult.
 
+Examples of input and output
+<pre>
+  $ ./xtf -c ETH Trader1 cryptoexchange.log
+  Trader1;2024-01-20 11:43:02;ETH;1.9417
+  Trader1;2024-01-22 09:17:40;ETH;10.9537
+</pre>
+<pre>
+  $ ./xtf -c ETH -c EUR -c GBP list-currency Trader1 cryptoexchange.log
+  ETH
+  EUR
+</pre>
+<pre>
+  $ ./xtf -c ETH -c USD Trader1 cryptoexchange.log
+  Trader1;2024-01-16 18:06:32;USD;-3000.0000
+  Trader1;2024-01-20 11:43:02;ETH;1.9417
+  Trader1;2024-01-22 09:17:40;ETH;10.9537
+</pre>
+<pre>
+  $ ./xtf status Trader1 cryptoexchange-1.log cryptoexchange-2.log.gz
+  ETH : 12.8954
+  EUR : -2000.0000
+  USD : -3000.0000
+</pre>
