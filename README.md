@@ -12,10 +12,11 @@ Value:       should contain the decimal number rounded to 4 decimals (separated 
 # Command and filters
 
 __Commands:__  
-- list  
-- list-currency  
-- status  
-- profit  
+- -h, --help: displays help instructions
+- list: displays all logs that include user (in order the files were passed)
+- list-currency: displays sorted list of all currencise held by and user
+- status: displays the sum of each individual currency held by and user
+- profit: displays the sum of each individual currency held by and user incresed by __XTF_PROFIT__%
 
 __Filters:__  
 - -a DATE  
