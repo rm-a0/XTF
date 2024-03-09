@@ -4,7 +4,11 @@ __USRENAME;DATE AND TIME;CURRENCY;VALUE__
 
 File xtf_sh supports Bourne Shell, which is a simple shell with basic features \
 File xtf_bash supports Bourne Again Shell, which is extended version of Bourne Shell \
-(difference is only in the code, xtf_sh should run on every UNIX-based system, while xtf_bash will probably not run on older ones)
+(difference is only in the code, xtf_sh should run on every UNIX-based system, while xtf_bash will probably not run on older ones) \
+\
+File xtf is the finalized and optimized version, customized to meet specific additional requirements \
+It supports Bourne Again Shell only and is more restricted (because of the additional requirements) \
+In this version multiple commands and filters (except -c) are not allowed.
 <pre>
 Username:    string containing printable ASCII characters only, without white spaces and semicolons
 Date         and time: must be in YYYY-MM-DD HH:MM:SS format
