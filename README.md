@@ -10,6 +10,7 @@ File xtf is the finalized and optimized version, customized to meet specific add
 It supports Bourne Again Shell only and is more restricted (because of the additional requirements) \
 In this version, the implementation restricts the usage of multiple commands and filters (excluding -c) \
 The application of filters has been enhanced to align with the description of commands (mainly because of sorting issues)
+It also checks if the content of the file is valid.
 <pre>
 Username:    string containing printable ASCII characters only, without white spaces and semicolons
 Date         and time: must be in YYYY-MM-DD HH:MM:SS format
