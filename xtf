@@ -156,27 +156,27 @@ check_file() {
     while IFS=';' read -r name date currency value; do
         # Check if any field is missing
         if [[ -z "$name" || -z "$date" || -z "$currency" || -z "$value" ]]; then
-            #echo "Error: Missing field in $logfile"
+            echo "Error: Missing field in $logfile"
             exit 1
         fi
         # Check name format
         if [[ "$name" =~ [[:space:]] ]]; then
-            #echo "Error: Invalid name format in $logfile"
+            echo "Error: Invalid name format in $logfile"
             exit 1
         fi
         # Check date format
         if ! date -d "$date" "+%Y-%m-%d %H:%M:%S" >/dev/null 2>&1; then
-            #echo "Error: Invalid date format in $logfile"
+            echo "Error: Invalid date format in $logfile"
             exit 1
         fi
         # Check currency format
         if ! [[ "$currency" =~ ^[A-Za-z]{3}$ ]]; then
-            #echo "Error: Invalid currency format in $logfile"
+            echo "Error: Invalid currency format in $logfile"
             exit 1
         fi
         # Check value format
         if ! [[ "$value" =~ ^-?[0-9]+(\.[0-9]{4})?$ ]]; then
-            #echo "Error: Invalid value format in $logfile"
+            echo "Error: Invalid value format in $logfile"
             exit 1
         fi
     done < "$logfile"
