@@ -1,4 +1,4 @@
-# Description
+# Overview
 Script for processing files (supports zipped files with .gz extensioin as well) that include records in this format: \
 __USRENAME;DATE AND TIME;CURRENCY;VALUE__
 
