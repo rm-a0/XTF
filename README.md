@@ -43,7 +43,7 @@ __Filters:__
 - -b DATETIME: Consider only records before this date and time (must be in YYYY-MM-DD HH:MM:SS format)
 - -c CURRENCY: Consider only records matching the specified currency (can be used multiple times)
 
-# How to run
+# How to use
 <pre>
   [-h|--help] [FILTER] [COMMAND] USER LOG [LOG2 [...]]
 </pre>
